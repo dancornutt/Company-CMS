@@ -23,9 +23,9 @@ These are the installation steps to get the site up and running:
  * Fork this repo 
  * Clone your Forked repo on your local machine
  * Navigate to the working directory containing cms.js
- * run 'npm i' to install dependencies
+ * Run 'npm i' to install dependencies
  * Create a database using the schema file
- * run 'node cms.js' to start the CLI and start using the system
+ * Run 'node cms.js' to start the CLI and start using the system
 
 ## Running the tests
 
