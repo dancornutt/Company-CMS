@@ -8,24 +8,24 @@ The intent of this project is to create a content management system through a CL
 
 You'll need to have a good text editor or IDE for making edits to the code. For this project VS Code was used and was very useful.
 Below are the tools used for this site:
-    * Text Editor
-    * Git
-    * Github account
-    * Inquirer
-    * MySQL
-    * Node
+ * Text Editor
+ * Git
+ * Github account
+ * Inquirer
+ * MySQL
+ * Node
 
 ### Installing
 
 These are the installation steps to get the site up and running:
 
-    * Log into Github
-    * Fork this repo 
-    * Clone your Forked repo on your local machine
-    * Navigate to the working directory containing cms.js
-    * run 'npm i' to install dependencies
-    * Create a database using the schema file
-    * run 'node cms.js' to start the CLI and start using the system
+ * Log into Github
+ * Fork this repo 
+ * Clone your Forked repo on your local machine
+ * Navigate to the working directory containing cms.js
+ * run 'npm i' to install dependencies
+ * Create a database using the schema file
+ * run 'node cms.js' to start the CLI and start using the system
 
 ## Running the tests
 
