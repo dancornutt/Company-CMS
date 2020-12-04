@@ -58,22 +58,22 @@ function runRootDir(){
 function searchAll() {
     // let qry = "SELECT * FROM employees";
     let qry = `
-    SELECT 
-        employees.id as id, 
-        employees.first_name as first_name, 
-        employees.last_name as last_name, 
-        roles.title as title,
-        roles.salary as salary, 
-        manager.first_name as manager_first_name,
-        manager.last_name as manager_last_name,
-        departments.name as department
-    FROM CompanyCMS.employees 
-    LEFT JOIN CompanyCMS.roles 
-    ON employees.role_id = roles.id
-    LEFT JOIN CompanyCMS.employees AS manager
-    ON employees.manager_id = manager.id
-    LEFT JOIN CompanyCMS.departments AS departments
-    ON roles.department_id = departments.id;
+        SELECT 
+            employees.id as id, 
+            employees.first_name as first_name, 
+            employees.last_name as last_name, 
+            roles.title as title,
+            roles.salary as salary, 
+            manager.first_name as manager_first_name,
+            manager.last_name as manager_last_name,
+            departments.name as department
+        FROM CompanyCMS.employees 
+        LEFT JOIN CompanyCMS.roles 
+        ON employees.role_id = roles.id
+        LEFT JOIN CompanyCMS.employees AS manager
+        ON employees.manager_id = manager.id
+        LEFT JOIN CompanyCMS.departments AS departments
+        ON roles.department_id = departments.id;
     `
     connection.query(qry, function(err, res) {
         if (err) throw err;
@@ -87,3 +87,53 @@ function searchAll() {
         runRootDir();
     })
 }
+
+function addEmployee(){
+    let qryRoles = "SELECT tile FROM roles";
+    let qryManagers = `
+        SELECT DISTINCT managers.first_name, managers.last_name
+        FROM CompanyCMS.employees
+        JOIN CompanyCMS.employees as managers
+        ON employees.manager_id = managers.id
+        ORDER BY managers.last_name ASC;
+        `;
+    let roles = [];
+    let managers = [];
+    connection.query(qryRoles, function(err, res) {
+        if (err) throw err;
+        console.log(res)
+        roles = [...res]
+    });
+    connection.query(qryManagers, function(err, res) {
+        if (err) throw err;
+        console.log(res)
+        managers = [...res]
+    });
+    inquirer
+        .prompt(
+            {
+            name: "first_name",
+            type: "input",
+            message: "What is the new employee's first name?"
+            },
+            {
+            name: "last_name",
+            type: "input",
+            message: "What is the new employee's first name?"    
+            },
+            {
+            name: "role",
+            type: "list",
+            message: "What is the role of the new employee?",
+            choices: roles
+            },
+            {
+            name: "manager",
+            type: "list",
+            message: "Who will be the new employee's manager?",
+            choices: managers
+            }
+        ).then(function (ans){
+            //Update query to add new employee
+        })
+};
