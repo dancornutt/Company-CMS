@@ -27,6 +27,8 @@ function runRootDir(){
               "Remove Employee",
               "Update Employee Role",
               "Update Employee Manager",
+              "Add Department",
+              "Add Role",
               "Exit"
             ]  
         }).then(function (ans){
@@ -48,6 +50,12 @@ function runRootDir(){
                     break;
                 case "Update Employee Manager":
                     updateEmployee("manager")
+                    break;
+                case "Add Department":
+                    addDepartment()
+                    break;
+                case "Add Role":
+                    addRole()
                     break;
                 case "Exit":
                     break;  
@@ -89,9 +97,9 @@ function searchAll() {
 }
 
 function addEmployee(){
-    let qryRoles = "SELECT tile FROM roles";
+    let qryRoles = "SELECT id, title FROM roles";
     let qryManagers = `
-        SELECT DISTINCT managers.first_name, managers.last_name
+        SELECT DISTINCT managers.id, managers.first_name, managers.last_name
         FROM CompanyCMS.employees
         JOIN CompanyCMS.employees as managers
         ON employees.manager_id = managers.id
@@ -101,12 +109,12 @@ function addEmployee(){
     let managers = [];
     connection.query(qryRoles, function(err, res) {
         if (err) throw err;
-        console.log(res)
+        console.log("Roles", res)
         roles = [...res]
     });
     connection.query(qryManagers, function(err, res) {
         if (err) throw err;
-        console.log(res)
+        console.log("Managers", res)
         managers = [...res]
     });
     inquirer
@@ -134,6 +142,60 @@ function addEmployee(){
             choices: managers
             }
         ).then(function (ans){
-            //Update query to add new employee
+            //Update query to add new employee          
+            qry = `INSERT INTO employees SET ?`
+            connection.query(qry, {
+                first_name: ans.first_name,
+                last_name: ans.last_name,
+                role_id: ans.role_id,
+                manager_id: ans.manager_id
+            });
+            runRootDir();
         })
 };
+
+function addDepartment() {
+    inquirer
+    .prompt(
+        {
+        name: "department_name",
+        type: "input",
+        message: "What is new Department name?"
+        }
+    ).then(function (ans){
+        //Update query to add new employee          
+        qry = `INSERT INTO departments SET ?`
+        connection.query(qry, {
+            name: ans.department_name,
+        });
+        runRootDir();
+    })
+};
+
+function addRole() {
+    inquirer
+    .prompt(
+        {
+        name: "role_title",
+        type: "input",
+        message: "What is new Role title?"
+        },
+        {
+        name: "role_salary",
+        type: "input",
+        message: "What is new Role salary?"
+        },
+        {
+        name: "role_department_id",
+        type: "input",
+        message: "What is new Role department_id?"
+        }
+    ).then(function (ans){
+        //Update query to add new employee          
+        qry = `INSERT INTO departments SET ?`
+        connection.query(qry, {
+            name: ans.department_name,
+        });
+        runRootDir();
+    })
+}
