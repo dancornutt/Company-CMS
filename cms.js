@@ -28,6 +28,7 @@ function runRootDir(){
               "Add Department",
               "View All Roles",
               "Add Role",
+              "Update Role",
               "Exit"
             ]  
         }).then(function (ans){
@@ -52,6 +53,9 @@ function runRootDir(){
                     break;
                 case "Add Role":
                     addRole();
+                    break;
+                case "Update Role":
+                    getRole()
                     break;
                 case "Exit":
                     break;  
@@ -104,14 +108,12 @@ async function addEmployee(){
     let managers = [];
     let qr1 = await connection.query(qryRoles, function(err, data) {
         if (err) throw err;
-        console.log("Roles", data);
         data.forEach(element => {
             roles.push({ id: element.id, title: element.title})
         });
     });
     let qr2 = await connection.query(qryManagers, function(err, data) {
         if (err) throw err;
-        console.log("Managers", data)
         data.forEach(element => {
             managers.push({ id: element.id, first_name: element.first_name, last_name: element.last_name })
         });
@@ -171,7 +173,7 @@ function updateEmployee(employee) {
         {
         name: "first_name",
         type: "input",
-        message: "Editing first name...",
+        message: "Editing first name. Original value was:",
         default: function () {
             return employee.split(" | ")[1].split(" ")[0];
             }
@@ -179,7 +181,7 @@ function updateEmployee(employee) {
         {
         name: "last_name",
         type: "input",
-        message: "What is the new employee's first name?",
+        message: "Editing last name. Original value was:",
         default: employee.split(" | ")[1].split(" ")[1]  
         }
     ]).then(function (ans){
@@ -206,7 +208,6 @@ async function getEmployee() {
         data.forEach(element => {
             employees.push({ id: element.id, first_name: element.first_name, last_name: element.last_name})
         });
-        console.log("PAUSE", employees)
         inquirer
         .prompt([
             {
@@ -222,13 +223,11 @@ async function getEmployee() {
                 }
             }
         ]).then(function (ans){
-            //Update query to add new employee
-            console.log("From get EM", ans.employee)         
+            //Update query to edit existing employee          
             updateEmployee(ans.employee);
         })
     });
-
-}
+};
 
 function viewAllDepartments() {
     qry = `
@@ -291,7 +290,7 @@ function viewAllRoles() {
 };
 
 function addRole() {
-    let qryDepartments = "SELECT id, name FROM departments;";
+    let qryDepartments = "SELECT id, title, FROM roles;";
     connection.query(qryDepartments, function(err, data) {
         if (err) throw err;
         inquirer
@@ -328,5 +327,68 @@ function addRole() {
             });
             runRootDir();
         })       
-    });   
+    })
+};
+
+function updateRole(role) {
+    inquirer
+    .prompt([
+        {
+        name: "title",
+        type: "input",
+        message: "Editing title. Original value was:",
+        default: function () {
+            return role.split(" | ")[1];
+            }
+        },
+        {
+        name: "salary",
+        type: "input",
+        message: "Editing salary name. Original value was:",
+        default: role.split(" | ")[2]  
+        }
+    ]).then(function (ans){
+        //Update query to update employee first and last names          
+        qry = `UPDATE roles SET ? WHERE ?;`
+        connection.query(qry, [
+            {
+            title: ans.title,
+            salary: ans.salary,
+            }, 
+            {
+            id: role.split(" | ")[0]
+            }
+        ]);
+        runRootDir();
+    })
+};
+
+async function getRole() {
+    let qry = "SELECT * FROM roles;";
+    let roles = [];
+    let qr1 = await connection.query(qry, function(err, data) {
+        if (err) throw err;
+        data.forEach(element => {
+            roles.push({ id: element.id, title: element.title, salary: element.salary})
+        });
+        inquirer
+        .prompt([
+            {
+            name: "role",
+            type: "list",
+            message: "Which role would you like to update?",
+            choices: function () {
+                let choiceArray = [];
+                roles.forEach(element => {
+                    choiceArray.push(`${element.id } | ${element.title} | ${element.salary}`);
+                });
+                return choiceArray;
+                }
+            }
+        ]).then(function (ans){
+            //Update query to edit existing role      
+            updateRole(ans.role);
+        })
+    });
+
 }
