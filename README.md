@@ -2,7 +2,7 @@
 
 The intent of this project is to create a content management system through a CLI Command Line Interface. The CLI interface will prompt the user with a series of options. The user can add employees types are Manager (one per team), Engineer, and Intern. After the user is done with one team member the CLI will ask if the user is done create the team. The user can select 'N' for no and add another team member. Once the user is done creating the team, the CLI generates the team.html page in the output folder at the working directory.
 
-![CompanyCMS](https://github.com/dancornutt/CompanyCMS/blob/main/assets/CompanyCMS.png)
+![CompanyCMS](https://github.com/dancornutt/Company-CMS/blob/main/assets/CompanyCMS.png)
 
 ### Prerequisites
 
