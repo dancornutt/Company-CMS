@@ -143,7 +143,7 @@ function addEmployee(){
             }
         ).then(function (ans){
             //Update query to add new employee          
-            qry = `INSERT INTO employees SET ?`
+            qry = `INSERT INTO employees SET ?;`
             connection.query(qry, {
                 first_name: ans.first_name,
                 last_name: ans.last_name,
@@ -163,8 +163,8 @@ function addDepartment() {
         message: "What is new Department name?"
         }
     ).then(function (ans){
-        //Update query to add new employee          
-        qry = `INSERT INTO departments SET ?`
+        //Update query to add new department          
+        qry = `INSERT INTO departments SET ?;`
         connection.query(qry, {
             name: ans.department_name,
         });
@@ -173,29 +173,43 @@ function addDepartment() {
 };
 
 function addRole() {
-    inquirer
-    .prompt(
-        {
-        name: "role_title",
-        type: "input",
-        message: "What is new Role title?"
-        },
-        {
-        name: "role_salary",
-        type: "input",
-        message: "What is new Role salary?"
-        },
-        {
-        name: "role_department_id",
-        type: "input",
-        message: "What is new Role department_id?"
-        }
-    ).then(function (ans){
-        //Update query to add new employee          
-        qry = `INSERT INTO departments SET ?`
-        connection.query(qry, {
-            name: ans.department_name,
-        });
-        runRootDir();
-    })
+    let qryDepartments = "SELECT id, name FROM departments;";
+    // let departments = {};
+    connection.query(qryDepartments, function(err, data) {
+        if (err) throw err;
+        inquirer
+        .prompt([
+            {
+            name: "role_title",
+            type: "input",
+            message: "What is new Role title?"
+            },
+            {
+            name: "role_salary",
+            type: "input",
+            message: "What is new Role salary?"
+            },
+            {
+            name: "department_name",
+            type: "list",
+            message: "What is new Role department?",
+            choices: function () {
+                let choiceArray = [];
+                data.forEach(element => {
+                    choiceArray.push(element.id + " | " + element.name);
+                });
+                return choiceArray;
+            }
+            }
+        ]).then(function (ans){
+            //Update query to add new employee      
+            qry = `INSERT INTO roles SET ?;`
+            connection.query(qry, {
+                title: ans.role_title,
+                salary: ans.role_salary,
+                department_id: ans.department_name.split(" | ")[0]     
+            });
+            runRootDir();
+        })       
+    });   
 }
