@@ -24,7 +24,6 @@ function runRootDir(){
               "View All Employees",
               "Add Employee",
               "Update Employee",
-              "Update Employee Role",
               "View All Departments",
               "Add Department",
               "View All Roles",
@@ -37,22 +36,22 @@ function runRootDir(){
                     searchAll();
                     break;
                 case "Add Employee":
-                    addEmployee()
+                    addEmployee();
                     break;
-                case "Update Employee Role":
-                    updateEmployee()
+                case "Update Employee":
+                    getEmployee()
                     break;
                 case "View All Departments":
-                    viewAllDepartments()
+                    viewAllDepartments();
                     break;
                 case "Add Department":
-                    addDepartment()
+                    addDepartment();
                     break;
                 case "View All Roles":
-                    viewAllRoles()
+                    viewAllRoles();
                     break;
                 case "Add Role":
-                    addRole()
+                    addRole();
                     break;
                 case "Exit":
                     break;  
@@ -165,6 +164,71 @@ async function addEmployee(){
             runRootDir();
         })
 };
+
+function updateEmployee(employee) {
+    inquirer
+    .prompt([
+        {
+        name: "first_name",
+        type: "input",
+        message: "Editing first name...",
+        default: function () {
+            return employee.split(" | ")[1].split(" ")[0];
+            }
+        },
+        {
+        name: "last_name",
+        type: "input",
+        message: "What is the new employee's first name?",
+        default: employee.split(" | ")[1].split(" ")[1]  
+        }
+    ]).then(function (ans){
+        //Update query to update employee first and last names          
+        qry = `UPDATE employees SET ? WHERE ?;`
+        connection.query(qry, [
+            {
+            first_name: ans.first_name,
+            last_name: ans.last_name,
+            }, 
+            {
+            id: employee.split(" | ")[0]
+            }
+        ]);
+        runRootDir();
+    })
+};
+
+async function getEmployee() {
+    let qry = "SELECT * FROM employees;";
+    let employees = [];
+    let qr1 = await connection.query(qry, function(err, data) {
+        if (err) throw err;
+        data.forEach(element => {
+            employees.push({ id: element.id, first_name: element.first_name, last_name: element.last_name})
+        });
+        console.log("PAUSE", employees)
+        inquirer
+        .prompt([
+            {
+            name: "employee",
+            type: "list",
+            message: "Which employee would you like to update?",
+            choices: function () {
+                let choiceArray = [];
+                employees.forEach(element => {
+                    choiceArray.push(`${element.id } | ${element.first_name} ${element.last_name}`);
+                });
+                return choiceArray;
+                }
+            }
+        ]).then(function (ans){
+            //Update query to add new employee
+            console.log("From get EM", ans.employee)         
+            updateEmployee(ans.employee);
+        })
+    });
+
+}
 
 function viewAllDepartments() {
     qry = `
