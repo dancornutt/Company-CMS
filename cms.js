@@ -22,12 +22,12 @@ function runRootDir(){
             message: "What would you like to do?",
             choices: [
               "View All Employees",
-              "View All Employees By Department",
               "Add Employee",
-              "Remove Employee",
+              "Update Employee",
               "Update Employee Role",
-              "Update Employee Manager",
+              "View All Departments",
               "Add Department",
+              "View All Roles",
               "Add Role",
               "Exit"
             ]  
@@ -36,23 +36,20 @@ function runRootDir(){
                 case "View All Employees":
                     searchAll();
                     break;
-                case "View All Employees By Department":
-                    searchByDepartment();
-                    break;
-                case "View All Employees By Manager":
-                    seachByManager();
-                    break;
                 case "Add Employee":
                     addEmployee()
                     break;
                 case "Update Employee Role":
-                    updateEmployee("role")
+                    updateEmployee()
                     break;
-                case "Update Employee Manager":
-                    updateEmployee("manager")
+                case "View All Departments":
+                    viewAllDepartments()
                     break;
                 case "Add Department":
                     addDepartment()
+                    break;
+                case "View All Roles":
+                    viewAllRoles()
                     break;
                 case "Add Role":
                     addRole()
@@ -64,7 +61,6 @@ function runRootDir(){
 };
 
 function searchAll() {
-    // let qry = "SELECT * FROM employees";
     let qry = `
         SELECT 
             employees.id as id, 
@@ -121,8 +117,6 @@ async function addEmployee(){
             managers.push({ id: element.id, first_name: element.first_name, last_name: element.last_name })
         });
     });
-    
-    console.log("PAUSE", roles, managers)
     inquirer
         .prompt([
             {
@@ -172,6 +166,26 @@ async function addEmployee(){
         })
 };
 
+function viewAllDepartments() {
+    qry = `
+        SELECT departments.name
+        FROM CompanyCMS.departments
+        ORDER BY departments.name ASC;
+        `;
+    connection.query(qry, function(err, data) {
+        if (err) throw err;
+        //Update query to add new role      
+        console.log(`Department`)
+        console.log(` ---------`)
+        for (let i = 0; i < data.length; i ++) {
+            console.log(
+                `${data[i].name}`
+            );
+        };
+        runRootDir();
+    })       
+};
+
 function addDepartment() {
     inquirer
     .prompt(
@@ -188,6 +202,28 @@ function addDepartment() {
         });
         runRootDir();
     })
+};
+
+function viewAllRoles() {
+    qry = `
+        SELECT roles.title, roles.salary, departments.name
+        FROM CompanyCMS.roles
+        JOIN CompanyCMS.departments
+        ON roles.department_id = departments.id
+        ORDER BY roles.salary ASC;
+        `;
+    connection.query(qry, function(err, data) {
+        if (err) throw err;
+        //Update query to add new role      
+        console.log(`Salary   Department   Title        `)
+        console.log(`------   ----------   -------------`)
+        for (let i = 0; i < data.length; i ++) {
+            console.log(
+                `${data[i].salary}   ${data[i].name}   ${data[i].title} `
+            );
+        };
+        runRootDir();
+    })       
 };
 
 function addRole() {
