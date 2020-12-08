@@ -96,7 +96,7 @@ function searchAll() {
     })
 }
 
-function addEmployee(){
+async function addEmployee(){
     let qryRoles = "SELECT id, title FROM roles";
     let qryManagers = `
         SELECT DISTINCT managers.id, managers.first_name, managers.last_name
@@ -107,18 +107,24 @@ function addEmployee(){
         `;
     let roles = [];
     let managers = [];
-    connection.query(qryRoles, function(err, res) {
+    let qr1 = await connection.query(qryRoles, function(err, data) {
         if (err) throw err;
-        console.log("Roles", res)
-        roles = [...res]
+        console.log("Roles", data);
+        data.forEach(element => {
+            roles.push({ id: element.id, title: element.title})
+        });
     });
-    connection.query(qryManagers, function(err, res) {
+    let qr2 = await connection.query(qryManagers, function(err, data) {
         if (err) throw err;
-        console.log("Managers", res)
-        managers = [...res]
+        console.log("Managers", data)
+        data.forEach(element => {
+            managers.push({ id: element.id, first_name: element.first_name, last_name: element.last_name })
+        });
     });
+    
+    console.log("PAUSE", roles, managers)
     inquirer
-        .prompt(
+        .prompt([
             {
             name: "first_name",
             type: "input",
@@ -133,22 +139,34 @@ function addEmployee(){
             name: "role",
             type: "list",
             message: "What is the role of the new employee?",
-            choices: roles
+            choices: function () {
+                let rolesArray = [];
+                roles.forEach(element => {
+                    rolesArray.push(`${element.id } | ${element.title}`);
+                });
+                return rolesArray;
+            }
             },
             {
             name: "manager",
             type: "list",
             message: "Who will be the new employee's manager?",
-            choices: managers
+            choices: function () {
+                let managerArray = [];
+                managers.forEach(element => {
+                    managerArray.push(`${element.id} | ${element.first_name} ${element.last_name}`);
+                });
+                return managerArray;
             }
-        ).then(function (ans){
+            }
+        ]).then(function (ans){
             //Update query to add new employee          
             qry = `INSERT INTO employees SET ?;`
             connection.query(qry, {
                 first_name: ans.first_name,
                 last_name: ans.last_name,
-                role_id: ans.role_id,
-                manager_id: ans.manager_id
+                role_id: ans.role.split(" | ")[0],
+                manager_id: ans.manager.split(" | ")[0]
             });
             runRootDir();
         })
@@ -174,7 +192,6 @@ function addDepartment() {
 
 function addRole() {
     let qryDepartments = "SELECT id, name FROM departments;";
-    // let departments = {};
     connection.query(qryDepartments, function(err, data) {
         if (err) throw err;
         inquirer
@@ -196,13 +213,13 @@ function addRole() {
             choices: function () {
                 let choiceArray = [];
                 data.forEach(element => {
-                    choiceArray.push(element.id + " | " + element.name);
+                    choiceArray.push(`${element.id} | ${element.name}`);
                 });
                 return choiceArray;
             }
             }
         ]).then(function (ans){
-            //Update query to add new employee      
+            //Update query to add new role      
             qry = `INSERT INTO roles SET ?;`
             connection.query(qry, {
                 title: ans.role_title,
