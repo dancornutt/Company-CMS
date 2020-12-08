@@ -40,9 +40,8 @@ This CMS system is accessed via the command line interface (CLI) so no deploymen
 * [Inquirer](https://www.npmjs.com/package/inquirer) - Command Line Interface prompts
 * [git](https://git-scm.com/) - Version control
 * [GitHub](https://github.com/) - Used to store the code base
-* [Chrome](https://www.google.com/chrome/) - Used as the browser
-* [Node](https://nodejs.org/en/)
-* [MySQL](https://www.mysql.com/)
+* [Node](https://nodejs.org/en/) - Used for backend CLI
+* [MySQL](https://www.mysql.com/) - Used for data storage and access
 
 ## Contributing
 
